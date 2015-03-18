@@ -15,7 +15,7 @@
 		 $(document).ready(function(){
 		 	$("#uno").click(function(){
 		
-		$.post("http://localhost/asignacion2/guardar.php").done(function(data) {
+		$.post("http://localhost/asignacion2_2/guardar.php").done(function(data) {
   			alert( data.success);
 			});
 		});});
@@ -32,7 +32,8 @@
 <h2>TABLA</h2>
 
 <form action="<?php  require_once("obtener.php");
-$val=obtener::recuperar('lista');?>" method="post">
+	$gb=new obtener;
+	$val=$gb->mostrar();?>" method="post">
 
    <input type="submit" name="submit" value="Recuperar"> 
 </form>
