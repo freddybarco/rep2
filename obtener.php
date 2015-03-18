@@ -2,53 +2,63 @@
 class obtener {
 
 
+	public $table='lista';
+	public $database='datos';
+	public $password='';
+	public $username='root';
+	public $servername='localhost';
 
 
-	public static function recuperar($table)
+	private function querydb()
 	{
-		$database='datos';
-		$password='';
-		$username='root';
-		$servername='localhost';
-		$dsn = 'mysql:dbname='.$database.';host='.$servername.';charset=utf8';
-		$pdo = new PDO($dsn, $username, $password );
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+		try {
+			$dsn = 'mysql:dbname='.$this->database.';host='.$this->servername.';charset=utf8';
+			$pdo = new PDO($dsn, $this->username, $this->password );
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-		$sql='SELECT time,value FROM '.$table;
+			$sql='SELECT time,value FROM '.$this->table;
 
-		$result = $pdo->query($sql);
-		$c=0;
-   		$salida=$result->fetchAll(PDO::FETCH_ASSOC);
-   		foreach ($salida as $key => $value) {
-   			//echo $key.'  time : '.$value['time'].'  valor: '.$value['value'].'<br>';
-   			$c=$c+1;
-   		}
+			$this->sQuery = $pdo->prepare($sql);
+			$pdo->beginTransaction();
+        	$this->sQuery->execute();
+        	$pdo->lastInsertId();
+        	$pdo->commit();
+			$result =$this->sQuery->fetchAll(PDO::FETCH_ASSOC);
+			//$result = $pdo->query($sql);
+			return $result;
+			} catch (PDOException $e) {
+    			print "Error" ;
+    			
+			}
+	
+	}
+	
+	public function mostrar()
+	{
+		$result=$this->querydb();
 
-   		//echo $c;
-   		//var_dump($salida);
+   		$tamano=sizeof($result);
+
    		$html= '<table border="1" style="width:50%">';
    		$html.= '<tr><td>Tiempo</td><td>Valores</td></tr>';
-   		for ($i=$c-16; $i <$c ; $i++) { 
+   		for ($i=$tamano-16; $i <$tamano ; $i++) { 
    			$html.= '<tr>';
-   			$html.= '<td>'.date('d/m/Y H:i:s',$salida[$i]['time']).'</td>';
-   			$html.= '<td>'.$salida[$i]['value'].'</td>';
+   			$html.= '<td>'.date('d/m/Y H:i:s',$result[$i]['time']).'</td>';
+   			$html.= '<td>'.$result[$i]['value'].'</td>';
    			$html.= '</tr>';
    		}
    		$html.= '</table>';
 		
 		return $html;
+
 	}
-	
-	
 
-}
+	}
 
-
-
-
-
-
-
+/*
+$gb=new obtener;
+	echo $gb->mostrar();
+*/
 
 ?>
